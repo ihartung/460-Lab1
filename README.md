@@ -1,32 +1,5 @@
 # 460-Lab1
 
-
-CS 460 Computer Communications and Networking
-BYUComputer Science
-
-    Winter 2016
-
-    Syllabus
-    Schedule
-    Homework
-        Networks and Delay
-        Applications
-        Transport Layer
-        Network Layer
-        Link Layer
-        Wireless
-        Multimedia Networks
-    Labs
-        Network Simulation
-        Reliable Transport
-        Congestion Control Part 1
-        Congestion Control Part 2
-        Routing
-    Help
-        Instructor and TAs
-        Office Hours
-        Discussion
-
 Lab: Network Simulation
 
 In this lab, you will learn about network simulation using a packet-level, event-driven simulator. You will use the simulator to setup some basic networks and verify its accuracy with respect to delay and loss. You will also examine the basic queueing theory result that delay grows exponentially as utilization approaches 100%.
