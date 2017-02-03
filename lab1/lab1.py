@@ -10,7 +10,7 @@ from src.packet import Packet
 from networks.network import Network
 
 
-class DelayHandler(object):
+class NormalHandler(object):
     @staticmethod
     def receive_packet(packet):
         print((Sim.scheduler.current_time(),
@@ -20,6 +20,18 @@ class DelayHandler(object):
                packet.transmission_delay,
                packet.propagation_delay,
                packet.queueing_delay))
+
+class LastHandler(object):
+    @staticmethod
+    def receive_packet(packet):
+        if packet.ident == 1000:
+            print((Sim.scheduler.current_time(),
+                   packet.ident,
+                   packet.created,
+                   Sim.scheduler.current_time() - packet.created,
+                   packet.transmission_delay,
+                   packet.propagation_delay,
+                   packet.queueing_delay))
 
 
 def main():
@@ -44,8 +56,8 @@ def main():
     n2.add_forwarding_entry(address=n1.get_address('n2'), link=n2.links[0])
 
     # setup app
-    d = DelayHandler()
-    net.nodes['n2'].add_protocol(protocol="delay", handler=d)
+    n = NormalHandler()
+    net.nodes['n2'].add_protocol(protocol="delay", handler=n)
 
     # send one packet
     p = Packet(destination_address=n2.get_address('n1'), ident=1, protocol='delay', length=1000)
@@ -71,8 +83,8 @@ def main():
     n2.add_forwarding_entry(address=n1.get_address('n2'), link=n2.links[0])
 
     # setup app
-    d = DelayHandler()
-    net.nodes['n2'].add_protocol(protocol="delay", handler=d)
+    n = NormalHandler()
+    net.nodes['n2'].add_protocol(protocol="delay", handler=n)
 
     # send one packet
     p = Packet(destination_address=n2.get_address('n1'), ident=1, protocol='delay', length=1000)
@@ -98,8 +110,8 @@ def main():
     n2.add_forwarding_entry(address=n1.get_address('n2'), link=n2.links[0])
 
     # setup app
-    d = DelayHandler()
-    net.nodes['n2'].add_protocol(protocol="delay", handler=d)
+    n = NormalHandler()
+    net.nodes['n2'].add_protocol(protocol="delay", handler=n)
 
     # send one packet
     p = Packet(destination_address=n2.get_address('n1'), ident=1, protocol='delay', length=1000)
@@ -138,11 +150,9 @@ def main():
     n2.add_forwarding_entry(address=n3.get_address('n2'), link=n2.links[1])
     n3.add_forwarding_entry(address=n2.get_address('n3'), link=n3.links[0])
 
-
     # setup app
-    d = DelayHandler()
-    # net.nodes['n2'].add_protocol(protocol="delay", handler=d)
-    net.nodes['n3'].add_protocol(protocol="delay", handler=d)
+    b = LastHandler()
+    net.nodes['n3'].add_protocol(protocol="delay", handler=b)
 
     # send 1MB
 
@@ -179,9 +189,8 @@ def main():
 
 
     # setup app
-    d = DelayHandler()
-    # net.nodes['n2'].add_protocol(protocol="delay", handler=d)
-    net.nodes['n3'].add_protocol(protocol="delay", handler=d)
+    b = LastHandler()
+    net.nodes['n3'].add_protocol(protocol="delay", handler=b)
 
     # send 1MB
 
@@ -218,9 +227,8 @@ def main():
 
 
     # setup app
-    d = DelayHandler()
-    # net.nodes['n2'].add_protocol(protocol="delay", handler=d)
-    net.nodes['n3'].add_protocol(protocol="delay", handler=d)
+    b = LastHandler()
+    net.nodes['n3'].add_protocol(protocol="delay", handler=b)
 
     # send 1MB
 
