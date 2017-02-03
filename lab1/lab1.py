@@ -349,11 +349,11 @@ def main():
     load = 0.4 * max_rate
     g = Generator(node=n1, destination=destination, load=load, duration=10)
     Sim.scheduler.add(delay=0, event='generate', handler=g.handle)
-    df = pd.DataFrame(data = data, columns=['Simulator Time', 'Packet Ident', 'Packet Create', 'Packet Time to Creation', 'Packet Transmission Delay', 'Packet Propagation Delay', 'Packet Queueing Delay'])
-    df.to_csv('results/40.csv', index=True, header=True)
 
     # run the simulation
     Sim.scheduler.run()
+    df = pd.DataFrame(data = data, columns=['Simulator Time', 'Packet Ident', 'Packet Create', 'Packet Time to Creation', 'Packet Transmission Delay', 'Packet Propagation Delay', 'Packet Queueing Delay'])
+    df.to_csv('results/40.csv', index=True, header=True)
 
     print("50% LOAD")
     data = []
@@ -379,11 +379,11 @@ def main():
     load = 0.6 * max_rate
     g = Generator(node=n1, destination=destination, load=load, duration=10)
     Sim.scheduler.add(delay=0, event='generate', handler=g.handle)
-    df = pd.DataFrame(data = data, columns=['Simulator Time', 'Packet Ident', 'Packet Create', 'Packet Time to Creation', 'Packet Transmission Delay', 'Packet Propagation Delay', 'Packet Queueing Delay'])
-    df.to_csv('results/60.csv', index=True, header=True)
 
     # run the simulation
     Sim.scheduler.run()
+    df = pd.DataFrame(data = data, columns=['Simulator Time', 'Packet Ident', 'Packet Create', 'Packet Time to Creation', 'Packet Transmission Delay', 'Packet Propagation Delay', 'Packet Queueing Delay'])
+    df.to_csv('results/60.csv', index=True, header=True)
 
     print("70% LOAD")
     data = []
@@ -460,13 +460,42 @@ def main():
     df = pd.DataFrame(data = data, columns=['Simulator Time', 'Packet Ident', 'Packet Create', 'Packet Time to Creation', 'Packet Transmission Delay', 'Packet Propagation Delay', 'Packet Queueing Delay'])
     df.to_csv('results/98.csv', index=True, header=True)
 
+    queueing_delay = []
+    df = pd.read_csv('results/10.csv')
+    queueing_delay.append((.10, df["Packet Queueing Delay"].mean()))
+    df = pd.read_csv('results/20.csv')
+    queueing_delay.append((.20, df["Packet Queueing Delay"].mean()))
+    df = pd.read_csv('results/30.csv')
+    queueing_delay.append((.30, df["Packet Queueing Delay"].mean()))
+    df = pd.read_csv('results/40.csv')
+    queueing_delay.append((.40, df["Packet Queueing Delay"].mean()))
+    df = pd.read_csv('results/50.csv')
+    queueing_delay.append((.50, df["Packet Queueing Delay"].mean()))
+    df = pd.read_csv('results/60.csv')
+    queueing_delay.append((.60, df["Packet Queueing Delay"].mean()))
+    df = pd.read_csv('results/70.csv')
+    queueing_delay.append((.70, df["Packet Queueing Delay"].mean()))
+    df = pd.read_csv('results/80.csv')
+    queueing_delay.append((.80, df["Packet Queueing Delay"].mean()))
+    df = pd.read_csv('results/90.csv')
+    queueing_delay.append((.90, df["Packet Queueing Delay"].mean()))
+    df = pd.read_csv('results/95.csv')
+    queueing_delay.append((.95, df["Packet Queueing Delay"].mean()))
+    df = pd.read_csv('results/98.csv')
+    queueing_delay.append((.98, df["Packet Queueing Delay"].mean()))
+
+    df = pd.DataFrame(data = queueing_delay, columns=['Utilization', 'Avg Packet Queueing Delay'])
+    df.to_csv('results/average_queueing_delay.csv', index=True, header=True)
+
     service = (1000.0*8)/1000000
     mu = 1.0/service
     rho = np.arange(0,1,1.0/100)
-    fig = plt.figure()
-    plt.plot(rho,(1/(2*mu))*(rho/(1-rho)),label='Theory',color="green")
-    plt.xlabel("Utilization")
-    plt.ylabel("Queueing Delay")
+    plt.figure()
+    ax = df.plot(x="Utilization",y="Avg Packet Queueing Delay")
+    ax.plot(rho,(1/(2*mu))*(rho/(1-rho)),label='Theory',color="green")
+    ax.set_xlabel("Utilization")
+    ax.set_ylabel("Queueing Delay")
+    fig = ax.get_figure()
     fig.savefig('results/queueing_delay.png')
 
 if __name__ == '__main__':
