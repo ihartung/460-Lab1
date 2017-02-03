@@ -10,6 +10,9 @@ from src.packet import Packet
 from networks.network import Network
 
 import random
+import pandas as pd
+
+data = []
 
 class Generator(object):
     def __init__(self, node, destination, load, duration):
@@ -33,33 +36,11 @@ class Generator(object):
         # schedule the next time we should generate a packet
         Sim.scheduler.add(delay=random.expovariate(self.load), event='generate', handler=self.handle)
 
-class NormalHandler(object):
-    @staticmethod
-    def receive_packet(packet):
-        print((Sim.scheduler.current_time(),
-               packet.ident,
-               packet.created,
-               Sim.scheduler.current_time() - packet.created,
-               packet.transmission_delay,
-               packet.propagation_delay,
-               packet.queueing_delay))
-
-class LastHandler(object):
-    @staticmethod
-    def receive_packet(packet):
-        if packet.ident == 1000:
-            print((Sim.scheduler.current_time(),
-                   packet.ident,
-                   packet.created,
-                   Sim.scheduler.current_time() - packet.created,
-                   packet.transmission_delay,
-                   packet.propagation_delay,
-                   packet.queueing_delay))
-
 class DelayHandler(object):
     @staticmethod
     def receive_packet(packet):
-        print((Sim.scheduler.current_time(),
+        global data
+        data.append((Sim.scheduler.current_time(),
                packet.ident,
                packet.created,
                Sim.scheduler.current_time() - packet.created,
@@ -77,6 +58,8 @@ def main():
     print("PART 1")
 
     # parameters
+    global data
+    data = []
     Sim.scheduler.reset()
 
     # setup network
@@ -89,8 +72,8 @@ def main():
     n2.add_forwarding_entry(address=n1.get_address('n2'), link=n2.links[0])
 
     # setup app
-    n = NormalHandler()
-    net.nodes['n2'].add_protocol(protocol="delay", handler=n)
+    d = DelayHandler()
+    net.nodes['n2'].add_protocol(protocol="delay", handler=d)
 
     # send one packet
     p = Packet(destination_address=n2.get_address('n1'), ident=1, protocol='delay', length=1000)
@@ -98,12 +81,14 @@ def main():
 
     # run the simulation
     Sim.scheduler.run()
-
+    df = pd.DataFrame(data = data, columns=['Simulator Time', 'Packet Ident', 'Packet Create', 'Packet Time to Creation', 'Packet Transmission Delay', 'Packet Propagation Delay', 'Packet Queueing Delay'])
+    df.to_csv('results/two_nodes_1.csv', index=True, header=True)
     ## Part 2
 
     print("PART 2")
 
     # parameters
+    data = []
     Sim.scheduler.reset()
 
     # setup network
@@ -116,8 +101,8 @@ def main():
     n2.add_forwarding_entry(address=n1.get_address('n2'), link=n2.links[0])
 
     # setup app
-    n = NormalHandler()
-    net.nodes['n2'].add_protocol(protocol="delay", handler=n)
+    d = DelayHandler()
+    net.nodes['n2'].add_protocol(protocol="delay", handler=d)
 
     # send one packet
     p = Packet(destination_address=n2.get_address('n1'), ident=1, protocol='delay', length=1000)
@@ -125,12 +110,15 @@ def main():
 
     # run the simulation
     Sim.scheduler.run()
+    df = pd.DataFrame(data = data, columns=['Simulator Time', 'Packet Ident', 'Packet Create', 'Packet Time to Creation', 'Packet Transmission Delay', 'Packet Propagation Delay', 'Packet Queueing Delay'])
+    df.to_csv('results/two_nodes_2.csv', index=True, header=True)
 
     ## Part 3
 
     print("PART 3")
 
     # parameters
+    data = []
     Sim.scheduler.reset()
 
     # setup network
@@ -143,8 +131,8 @@ def main():
     n2.add_forwarding_entry(address=n1.get_address('n2'), link=n2.links[0])
 
     # setup app
-    n = NormalHandler()
-    net.nodes['n2'].add_protocol(protocol="delay", handler=n)
+    d = DelayHandler()
+    net.nodes['n2'].add_protocol(protocol="delay", handler=d)
 
     # send one packet
     p = Packet(destination_address=n2.get_address('n1'), ident=1, protocol='delay', length=1000)
@@ -159,6 +147,8 @@ def main():
 
     # run the simulation
     Sim.scheduler.run()
+    df = pd.DataFrame(data = data, columns=['Simulator Time', 'Packet Ident', 'Packet Create', 'Packet Time to Creation', 'Packet Transmission Delay', 'Packet Propagation Delay', 'Packet Queueing Delay'])
+    df.to_csv('results/two_nodes_3.csv', index=True, header=True)
 
     ####################
     print("THREE NODES")
@@ -168,6 +158,7 @@ def main():
     print("PART 1")
 
     # parameters
+    data = []
     Sim.scheduler.reset()
 
     # setup network
@@ -184,8 +175,8 @@ def main():
     n3.add_forwarding_entry(address=n2.get_address('n3'), link=n3.links[0])
 
     # setup app
-    b = LastHandler()
-    net.nodes['n3'].add_protocol(protocol="delay", handler=b)
+    d = DelayHandler()
+    net.nodes['n3'].add_protocol(protocol="delay", handler=d)
 
     # send 1MB
 
@@ -199,12 +190,15 @@ def main():
 
     # run the simulation
     Sim.scheduler.run()
+    df = pd.DataFrame(data = data, columns=['Simulator Time', 'Packet Ident', 'Packet Create', 'Packet Time to Creation', 'Packet Transmission Delay', 'Packet Propagation Delay', 'Packet Queueing Delay'])
+    df.to_csv('results/three_nodes_1.csv', index=True, header=True)
 
     ## Part 2
 
     print("PART 2")
 
     # parameters
+    data = []
     Sim.scheduler.reset()
 
     # setup network
@@ -222,8 +216,8 @@ def main():
 
 
     # setup app
-    b = LastHandler()
-    net.nodes['n3'].add_protocol(protocol="delay", handler=b)
+    d = DelayHandler()
+    net.nodes['n3'].add_protocol(protocol="delay", handler=d)
 
     # send 1MB
 
@@ -237,12 +231,15 @@ def main():
 
     # run the simulation
     Sim.scheduler.run()
+    df = pd.DataFrame(data = data, columns=['Simulator Time', 'Packet Ident', 'Packet Create', 'Packet Time to Creation', 'Packet Transmission Delay', 'Packet Propagation Delay', 'Packet Queueing Delay'])
+    df.to_csv('results/two_nodes_2.csv', index=True, header=True)
 
     ## Part 3
 
     print("PART 3")
 
     # parameters
+    data = []
     Sim.scheduler.reset()
 
     # setup network
@@ -260,8 +257,8 @@ def main():
 
 
     # setup app
-    b = LastHandler()
-    net.nodes['n3'].add_protocol(protocol="delay", handler=b)
+    d = DelayHandler()
+    net.nodes['n3'].add_protocol(protocol="delay", handler=d)
 
     # send 1MB
 
@@ -275,11 +272,14 @@ def main():
 
     # run the simulation
     Sim.scheduler.run()
+    df = pd.DataFrame(data = data, columns=['Simulator Time', 'Packet Ident', 'Packet Create', 'Packet Time to Creation', 'Packet Transmission Delay', 'Packet Propagation Delay', 'Packet Queueing Delay'])
+    df.to_csv('results/two_nodes_3.csv', index=True, header=True)
 
     ####################
     print("QUEUEING DELAY")
 
     # parameters
+    data = []
     Sim.scheduler.reset()
 
     # setup network
@@ -305,8 +305,11 @@ def main():
 
     # run the simulation
     Sim.scheduler.run()
+    df = pd.DataFrame(data = data, columns=['Simulator Time', 'Packet Ident', 'Packet Create', 'Packet Time to Creation', 'Packet Transmission Delay', 'Packet Propagation Delay', 'Packet Queueing Delay'])
+    df.to_csv('results/10.csv', index=True, header=True)
 
     print("20% LOAD")
+    data = []
     Sim.scheduler.reset()
     # setup packet generator
     destination = n2.get_address('n1')
@@ -317,8 +320,11 @@ def main():
 
     # run the simulation
     Sim.scheduler.run()
+    df = pd.DataFrame(data = data, columns=['Simulator Time', 'Packet Ident', 'Packet Create', 'Packet Time to Creation', 'Packet Transmission Delay', 'Packet Propagation Delay', 'Packet Queueing Delay'])
+    df.to_csv('results/20.csv', index=True, header=True)
 
     print("30% LOAD")
+    data = []
     Sim.scheduler.reset()
     # setup packet generator
     destination = n2.get_address('n1')
@@ -329,8 +335,11 @@ def main():
 
     # run the simulation
     Sim.scheduler.run()
+    df = pd.DataFrame(data = data, columns=['Simulator Time', 'Packet Ident', 'Packet Create', 'Packet Time to Creation', 'Packet Transmission Delay', 'Packet Propagation Delay', 'Packet Queueing Delay'])
+    df.to_csv('results/30.csv', index=True, header=True)
 
     print("40% LOAD")
+    data = []
     Sim.scheduler.reset()
     # setup packet generator
     destination = n2.get_address('n1')
@@ -338,11 +347,14 @@ def main():
     load = 0.4 * max_rate
     g = Generator(node=n1, destination=destination, load=load, duration=10)
     Sim.scheduler.add(delay=0, event='generate', handler=g.handle)
+    df = pd.DataFrame(data = data, columns=['Simulator Time', 'Packet Ident', 'Packet Create', 'Packet Time to Creation', 'Packet Transmission Delay', 'Packet Propagation Delay', 'Packet Queueing Delay'])
+    df.to_csv('results/40.csv', index=True, header=True)
 
     # run the simulation
     Sim.scheduler.run()
 
     print("50% LOAD")
+    data = []
     Sim.scheduler.reset()
     # setup packet generator
     destination = n2.get_address('n1')
@@ -353,8 +365,11 @@ def main():
 
     # run the simulation
     Sim.scheduler.run()
+    df = pd.DataFrame(data = data, columns=['Simulator Time', 'Packet Ident', 'Packet Create', 'Packet Time to Creation', 'Packet Transmission Delay', 'Packet Propagation Delay', 'Packet Queueing Delay'])
+    df.to_csv('results/50.csv', index=True, header=True)
 
     print("60% LOAD")
+    data = []
     Sim.scheduler.reset()
     # setup packet generator
     destination = n2.get_address('n1')
@@ -362,11 +377,14 @@ def main():
     load = 0.6 * max_rate
     g = Generator(node=n1, destination=destination, load=load, duration=10)
     Sim.scheduler.add(delay=0, event='generate', handler=g.handle)
+    df = pd.DataFrame(data = data, columns=['Simulator Time', 'Packet Ident', 'Packet Create', 'Packet Time to Creation', 'Packet Transmission Delay', 'Packet Propagation Delay', 'Packet Queueing Delay'])
+    df.to_csv('results/60.csv', index=True, header=True)
 
     # run the simulation
     Sim.scheduler.run()
 
     print("70% LOAD")
+    data = []
     Sim.scheduler.reset()
     # setup packet generator
     destination = n2.get_address('n1')
@@ -377,8 +395,11 @@ def main():
 
     # run the simulation
     Sim.scheduler.run()
+    df = pd.DataFrame(data = data, columns=['Simulator Time', 'Packet Ident', 'Packet Create', 'Packet Time to Creation', 'Packet Transmission Delay', 'Packet Propagation Delay', 'Packet Queueing Delay'])
+    df.to_csv('results/70.csv', index=True, header=True)
 
     print("80% LOAD")
+    data = []
     Sim.scheduler.reset()
     # setup packet generator
     destination = n2.get_address('n1')
@@ -389,8 +410,11 @@ def main():
 
     # run the simulation
     Sim.scheduler.run()
+    df = pd.DataFrame(data = data, columns=['Simulator Time', 'Packet Ident', 'Packet Create', 'Packet Time to Creation', 'Packet Transmission Delay', 'Packet Propagation Delay', 'Packet Queueing Delay'])
+    df.to_csv('results/80.csv', index=True, header=True)
 
     print("90% LOAD")
+    data = []
     Sim.scheduler.reset()
     # setup packet generator
     destination = n2.get_address('n1')
@@ -401,8 +425,11 @@ def main():
 
     # run the simulation
     Sim.scheduler.run()
+    df = pd.DataFrame(data = data, columns=['Simulator Time', 'Packet Ident', 'Packet Create', 'Packet Time to Creation', 'Packet Transmission Delay', 'Packet Propagation Delay', 'Packet Queueing Delay'])
+    df.to_csv('results/90.csv', index=True, header=True)
 
     print("95% LOAD")
+    data = []
     Sim.scheduler.reset()
     # setup packet generator
     destination = n2.get_address('n1')
@@ -413,8 +440,11 @@ def main():
 
     # run the simulation
     Sim.scheduler.run()
+    df = pd.DataFrame(data = data, columns=['Simulator Time', 'Packet Ident', 'Packet Create', 'Packet Time to Creation', 'Packet Transmission Delay', 'Packet Propagation Delay', 'Packet Queueing Delay'])
+    df.to_csv('results/95.csv', index=True, header=True)
 
     print("98% LOAD")
+    data = []
     Sim.scheduler.reset()
     # setup packet generator
     destination = n2.get_address('n1')
@@ -425,6 +455,8 @@ def main():
 
     # run the simulation
     Sim.scheduler.run()
+    df = pd.DataFrame(data = data, columns=['Simulator Time', 'Packet Ident', 'Packet Create', 'Packet Time to Creation', 'Packet Transmission Delay', 'Packet Propagation Delay', 'Packet Queueing Delay'])
+    df.to_csv('results/98.csv', index=True, header=True)
 
 if __name__ == '__main__':
     main()
