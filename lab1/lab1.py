@@ -12,6 +12,7 @@ from networks.network import Network
 import random
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
 
 data = []
 
@@ -458,6 +459,15 @@ def main():
     Sim.scheduler.run()
     df = pd.DataFrame(data = data, columns=['Simulator Time', 'Packet Ident', 'Packet Create', 'Packet Time to Creation', 'Packet Transmission Delay', 'Packet Propagation Delay', 'Packet Queueing Delay'])
     df.to_csv('results/98.csv', index=True, header=True)
+
+    service = (1000.0*8)/1000000
+    mu = 1.0/service
+    rho = np.arange(0,1,1.0/100)
+    fig = plt.figure()
+    plt.plot(rho,(1/(2*mu))*(rho/(1-rho)),label='Theory',color="green")
+    plt.xlabel("Utilization")
+    plt.ylabel("Queueing Delay")
+    fig.savefig('results/queueing_delay.png')
 
 if __name__ == '__main__':
     main()
