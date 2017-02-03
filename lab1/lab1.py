@@ -490,9 +490,15 @@ def main():
     service = (1000.0*8)/1000000
     mu = 1.0/service
     rho = np.arange(0,1,1.0/100)
+    values = (1/(2*mu))*(rho/(1-rho))
     plt.figure()
-    ax = df.plot(x="Utilization",y="Avg Packet Queueing Delay")
-    ax.plot(rho,(1/(2*mu))*(rho/(1-rho)),label='Theory',color="green")
+
+    df = pd.DataFrame(data = zip(rho, values), columns=['Utilization', 'Theoretical Queueing Delay'])
+    ax = df.plot(x="Utilization",y="Theoretical Queueing Delay", color="green")
+
+    df = pd.read_csv('results/average_queueing_delay.csv')
+    df.plot(x="Utilization",y="Avg Packet Queueing Delay", ax=ax)
+
     ax.set_xlabel("Utilization")
     ax.set_ylabel("Queueing Delay")
     fig = ax.get_figure()
