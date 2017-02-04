@@ -264,9 +264,9 @@ def main():
 
     # send 1MB
 
-    for i in range(0, 8000000//8000):
+    for i in range(0, 8000000/8000):
         p = Packet(destination_address=n3.get_address('n2'), ident=i + 1, protocol='delay', length=8000)
-        transmissionDelay = 8000 // n1.links[0].bandwidth
+        transmissionDelay = 8000 / n1.links[0].bandwidth
         calculatedDelay = i * transmissionDelay
         Sim.scheduler.add(delay=calculatedDelay, event=p, handler=n1.send_packet)
 
