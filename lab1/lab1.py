@@ -113,7 +113,7 @@ def main():
     # run the simulation
     Sim.scheduler.run()
     df = pd.DataFrame(data = data, columns=['Simulator Time', 'Packet Ident', 'Packet Create', 'Packet Time to Creation', 'Packet Transmission Delay', 'Packet Propagation Delay', 'Packet Queueing Delay'])
-    df.to_csv('results/two_nodes_2.csv', index=True, header=True)
+    df.to_csv('results/two_nodes_2_0.csv', index=True, header=True)
 
     ## Part 3
 
@@ -150,7 +150,7 @@ def main():
     # run the simulation
     Sim.scheduler.run()
     df = pd.DataFrame(data = data, columns=['Simulator Time', 'Packet Ident', 'Packet Create', 'Packet Time to Creation', 'Packet Transmission Delay', 'Packet Propagation Delay', 'Packet Queueing Delay'])
-    df.to_csv('results/two_nodes_3.csv', index=True, header=True)
+    df.to_csv('results/two_nodes_3_0.csv', index=True, header=True)
 
     ####################
     print("THREE NODES")

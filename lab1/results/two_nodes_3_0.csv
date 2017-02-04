@@ -1,0 +1,5 @@
+,Simulator Time,Packet Ident,Packet Create,Packet Time to Creation,Packet Transmission Delay,Packet Propagation Delay,Packet Queueing Delay
+0,0.018,1,0.0,0.018,0.008,0.01,0.0
+1,0.026,2,0.0,0.026,0.008,0.01,0.008
+2,0.034,3,0.0,0.034,0.008,0.01,0.016
+3,2.018,4,2.0,0.018,0.008,0.01,0.0
