@@ -30,30 +30,9 @@ class AppHandler(object):
         self.f.flush()
 
 
-class Main(object):
+class Trans(object):
     def __init__(self):
         self.directory = 'received'
-        self.parse_options()
-        self.run()
-        self.diff()
-        self.filename = None
-        self.loss = None
-
-    def parse_options(self):
-        parser = optparse.OptionParser(usage="%prog [options]",
-                                       version="%prog 0.1")
-
-        parser.add_option("-f", "--filename", type="str", dest="filename",
-                          default='test.txt',
-                          help="filename to send")
-
-        parser.add_option("-l", "--loss", type="float", dest="loss",
-                          default=0.0,
-                          help="random loss rate")
-
-        (options, args) = parser.parse_args()
-        self.filename = options.filename
-        self.loss = options.loss
 
     def diff(self):
         args = ['diff', '-u', self.filename, os.path.join(self.directory, self.filename)]
@@ -66,11 +45,17 @@ class Main(object):
             print()
             print(result)
 
-    def run(self):
+    def run(self, janela, perda, fila):
+        
+        self.filename = fila
+        self.loss     = perda
+        Sim.trace('Trans', "%f : this is the loss." % (self.loss))
+        
         # parameters
         Sim.scheduler.reset()
         Sim.set_debug('AppHandler')
         Sim.set_debug('TCP')
+        Sim.set_debug('Trans')
 
         # setup network
         net = Network('./network.txt')
@@ -90,8 +75,8 @@ class Main(object):
         a = AppHandler(self.filename)
 
         # setup connection
-        c1 = TCP(t1, n1.get_address('n2'), 1, n2.get_address('n1'), 1, a, window=3000)
-        c2 = TCP(t2, n2.get_address('n1'), 1, n1.get_address('n2'), 1, a, window=3000)
+        c1 = TCP(t1, n1.get_address('n2'), 1, n2.get_address('n1'), 1, a, window=janela)
+        c2 = TCP(t2, n2.get_address('n1'), 1, n1.get_address('n2'), 1, a, window=janela)
 
         # send a file
         with open(self.filename, 'rb') as f:
@@ -103,6 +88,11 @@ class Main(object):
 
         # run the simulation
         Sim.scheduler.run()
+
+        self.diff()
+
+        self.filename = None
+        self.loss     = None
 
 
 if __name__ == '__main__':

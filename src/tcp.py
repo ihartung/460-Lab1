@@ -28,17 +28,13 @@ class TCP(Connection):
         # largest sequence number that has been ACKed so far; represents
         # the next sequence number the client expects to receive
         self.sequence = 0
+        self.repeat = 0
         self.count = 0
         # retransmission timer
         self.timer = None
         # timeout duration in seconds
         self.timeout = 1
-        
-        self.rto = 3
-        
-        self.srtt = -1
-        
-        self.rttvar = -1
+
 
         # -- Receiver functionality
 
@@ -47,19 +43,6 @@ class TCP(Connection):
         # ack number to send; represents the largest in-order sequence
         # number not yet received
         self.ack = 0
-    
-    def parse_options(self):
-        parser = optparse.OptionParser(usage="%prog [options]",
-                                       version="%prog 0.1")
-            
-        parser.add_option("-w", "--window", type="float", dest="window",
-                         default='test.txt',
-                         help="filename to send")
-
-    
-    (options, args) = parser.parse_args()
-    self.filename = options.filename
-    self.loss = options.loss
 
     def trace(self, message):
         """ Print debugging messages. """
@@ -77,19 +60,17 @@ class TCP(Connection):
     ''' Sender '''
 
     def send(self, data):
+        
         self.send_buffer.put(data)
+        
+        self.timer = Sim.scheduler.add(delay=self.timeout, event='retransmit', handler=self.retransmit)
         
         while (self.send_buffer.outstanding() < self.window):
             size = self.mss
-            left = self.send_buffer.available()
-            if left < self.mss:
-                size = left
             d, s = self.send_buffer.get(size);
             self.send_packet(d, s)
             if not self.send_buffer.available():
-                self.cancel_timer()
                 return
-        self.timer = Sim.scheduler.add(delay=self.timeout, event='retransmit', handler=self.retransmit)
 
     def send_packet(self, data, sequence):
         packet = TCPPacket(source_address=self.source_address,
@@ -110,29 +91,24 @@ class TCP(Connection):
 
     def handle_ack(self, packet):
         """ Handle an incoming ACK. """
-        self.send_buffer.slide(packet.ack_number)
-        self.sequence = packet.ack_number
-        rtt = Sim.scheduler.current_time()
-        if self.srtt == -1:
-            self.srtt = rtt
-            self.rttvar = rtt/2
+        self.trace("XXXXXXXXXXXXXXp_ack: %s, self.seq: %d" % (packet.ack_number, self.sequence))
+        if packet.ack_number == self.sequence:
+            self.repeat = self.repeat + 1
         else:
-            self.rttvar = 3/4 * self.rttvar + math.fabs(self.srtt-rtt)/4
-            self.srtt = 7/8 * self.srtt + rtt/8
-        self.rto = self.srtt + 4 * self.rttvar;
-        if self.rto < 1 :
-            self.rto = 1
+            self.repeat   = 1
+            self.sequence = packet.ack_number
+            self.send_buffer.slide(packet.ack_number)
+        if self.repeat == 4:
+            self.trace("fast_restransmit.  seq = %d" % (self.sequence))
+            Sim.scheduler.advance_time(1)
+        self.trace("XXXXXXXXXXXXXXseq: %s, ack: %d" % (self.sequence, self.ack))
         Sim.scheduler.reset()
         while (self.send_buffer.outstanding() < self.window):
             size = self.mss
-            left = self.send_buffer.available()
-            if left < self.mss:
-                size = left
             d, s = self.send_buffer.get(size);
             self.send_packet(d, s)
             if not self.send_buffer.available():
-                self.cancel_timer()
-                break
+                return
                                  
                                  
         
@@ -140,11 +116,12 @@ class TCP(Connection):
     def retransmit(self, event):
         """ Retransmit data. """
         self.trace("%s (%d) retransmission timer fired" % (self.node.hostname, self.source_address))
+        self.trace("seq: %s, ack: %d" % (self.sequence, self.ack))
+        if not self.send_buffer.outstanding():
+            self.cancel_timer()
+            return
         size = self.mss
-        left = self.send_buffer.available()
-        if left < self.mss:
-            size = left
-        d, s = self.send_buffer.get(size);
+        d, s = self.send_buffer.resend(size);
         self.send_packet(d, s)
         Sim.scheduler.reset()
 
@@ -165,8 +142,7 @@ class TCP(Connection):
             self.node.hostname, packet.destination_address, packet.source_address, packet.sequence))
         self.receive_buffer.put(packet.body, packet.sequence)
         d, s = self.receive_buffer.get()
-        self.ack = packet.sequence + packet.length
-        self.sequence = packet.sequence
+        self.ack = len(d) + s
         self.app.receive_data(d)
         self.send_ack()
 
