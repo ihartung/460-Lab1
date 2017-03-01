@@ -12,7 +12,7 @@ class TCP(Connection):
     """ A TCP connection between two hosts."""
 
     def __init__(self, transport, source_address, source_port,
-                 destination_address, destination_port, app=None, window=1000):
+                 destination_address, destination_port, app=None, window=1000, fast_restransmit=False):
         Connection.__init__(self, transport, source_address, source_port,
                             destination_address, destination_port, app)
 
@@ -34,6 +34,8 @@ class TCP(Connection):
         self.timer = None
         # timeout duration in seconds
         self.timeout = 1
+        
+        self.fast_restransmit = fast_restransmit
 
 
         # -- Receiver functionality
@@ -90,17 +92,20 @@ class TCP(Connection):
     def handle_ack(self, packet):
         """ Handle an incoming ACK. """
         self.trace("OOOOOOOOOOOOOOOReceiving this p_ack in handle_ack: %s, self.seq: %d" % (packet.ack_number, self.sequence))
-        '''if packet.ack_number == self.sequence:
-            self.repeat = self.repeat + 1
-        else:
-            self.repeat   = 1
-            self.sequence = packet.ack_number
-            self.send_buffer.slide(packet.ack_number)
-        if self.repeat == 4:
-            self.trace("fast_restransmit.  seq = %d" % (self.sequence))
-            Sim.scheduler.advance_time(1)'''
         if self.sequence >= packet.ack_number:
             return
+        # Fast Restransmit
+        if self.fast_restransmit:
+            if packet.ack_number == self.sequence:
+                self.repeat = self.repeat + 1
+            else:
+                self.repeat   = 1
+                self.sequence = packet.ack_number
+                self.send_buffer.slide(packet.ack_number)
+            if self.repeat == 4:
+                self.trace("fast_restransmit.  seq = %d" % (self.sequence))
+                self.cancel_timer
+                self.retransmit()
         self.sequence = packet.ack_number
         self.send_buffer.slide(packet.ack_number)
         self.trace("XXXXXXXXXXXXXXseq: %s, ack: %d" % (self.sequence, self.ack))

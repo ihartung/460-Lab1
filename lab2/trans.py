@@ -45,7 +45,7 @@ class Trans(object):
             print()
             print(result)
 
-    def run(self, janela, perda, fila):
+    def run(self, janela, perda, fila, fast=False):
         
         self.filename = fila
         loss     = perda
@@ -60,10 +60,14 @@ class Trans(object):
         # setup network
         net = Network('./network.txt')
         net.loss(loss)
+        
 
         # setup routes
         n1 = net.get_node('n1')
         n2 = net.get_node('n2')
+        net.set_queue(n1.links[0], 100)
+        net.set_queue(n2.links[0], 100)
+        
         n1.add_forwarding_entry(address=n2.get_address('n1'), link=n1.links[0])
         n2.add_forwarding_entry(address=n1.get_address('n2'), link=n2.links[0])
 
@@ -75,8 +79,8 @@ class Trans(object):
         a = AppHandler(self.filename)
 
         # setup connection
-        c1 = TCP(t1, n1.get_address('n2'), 1, n2.get_address('n1'), 1, a, window=janela)
-        c2 = TCP(t2, n2.get_address('n1'), 1, n1.get_address('n2'), 1, a, window=janela)
+        c1 = TCP(t1, n1.get_address('n2'), 1, n2.get_address('n1'), 1, a, window=janela, fast_retransmit = fast)
+        c2 = TCP(t2, n2.get_address('n1'), 1, n1.get_address('n2'), 1, a, window=janela, fast_retransmit = fast)
 
         # send a file
         with open(self.filename, 'rb') as f:
