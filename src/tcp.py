@@ -66,8 +66,6 @@ class TCP(Connection):
         # set a timer
         if not self.timer:
             self.timer = Sim.scheduler.add(delay=self.timeout, event='retransmit', handler=self.retransmit)
-        else:
-            Sim.scheduler.reset()
         
         while (self.send_buffer.outstanding() < self.window):
             size = self.mss
@@ -106,7 +104,8 @@ class TCP(Connection):
         self.sequence = packet.ack_number
         self.send_buffer.slide(packet.ack_number)
         self.trace("XXXXXXXXXXXXXXseq: %s, ack: %d" % (self.sequence, self.ack))
-        Sim.scheduler.reset()
+        self.cancel_timer()
+        self.timer = Sim.scheduler.add(delay=self.timeout, event='retransmit', handler=self.retransmit)
         while (self.send_buffer.outstanding() < self.window):
             size = self.mss
             d, s = self.send_buffer.get(size);
@@ -122,14 +121,12 @@ class TCP(Connection):
         self.trace("%s (%d) retransmission timer fired" % (self.node.hostname, self.source_address))
         self.trace("YYYYYYYYYYYYseq: %s, ack: %d" % (self.sequence, self.ack))
         self.trace("YYYYYYYYYYYYout: %s, available: %d" % (self.send_buffer.outstanding(), self.send_buffer.available()))
-        '''if self.send_buffer.outstanding() == 0 and self.send_buffer.available() == 0:
-            self.cancel_timer()
-            return'''
+        if self.send_buffer.outstanding() == 0 and self.send_buffer.available() == 0:
+            return
         size = self.mss
         d, s = self.send_buffer.resend(size)
         self.send_packet(d, s)
-        Sim.scheduler.reset()
-        self.trace("I just reset"%())
+        self.timer = Sim.scheduler.add(delay=self.timeout, event='retransmit', handler=self.retransmit)
 
     def cancel_timer(self):
         """ Cancel the timer. """
