@@ -32,7 +32,7 @@ def main():
 
     tester.run(10000, 0, "internet-architecture.pdf", True)
     tester.run(10000, .2, "internet-architecture.pdf", True)
-    tester.run(10000, .2, "internet-architecture.pdf", True)
+    tester.run(10000, .2, "internet-architecture.pdf", False)
 
 
     #Experiments

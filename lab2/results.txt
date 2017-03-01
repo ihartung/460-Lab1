@@ -1,0 +1,44 @@
+
+File transfer correct!
+1.0832 It is False that I am using fast transmit.
+
+File transfer correct!
+4.1048 It is False that I am using fast transmit.
+
+File transfer correct!
+4.0856 It is False that I am using fast transmit.
+
+File transfer correct!
+11.1256 It is False that I am using fast transmit.
+
+File transfer correct!
+2.084416 It is False that I am using fast transmit.
+
+File transfer correct!
+32.715616 It is True that I am using fast transmit.
+
+File transfer correct!
+2.084416 It is True that I am using fast transmit.
+
+File transfer correct!
+81.156 It is False that I am using fast transmit.
+
+File transfer correct!
+75.046016 It is False that I am using fast transmit.
+
+File transfer correct!
+11.711616 It is False that I am using fast transmit.
+
+File transfer correct!
+6.366016 It is False that I am using fast transmit.
+
+File transfer correct!
+3.145216 It is False that I am using fast transmit.
+
+File transfer correct!
+2.084416 It is False that I am using fast transmit.
+
+File transfer correct!
+1.730816 It is False that I am using fast transmit.
+
+File transfer correct!
