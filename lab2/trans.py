@@ -48,8 +48,8 @@ class Trans(object):
     def run(self, janela, perda, fila):
         
         self.filename = fila
-        self.loss     = perda
-        Sim.trace('Trans', "%f : this is the loss." % (self.loss))
+        loss     = perda
+        Sim.trace('Trans', "%f : this is the loss." % (loss))
         
         # parameters
         Sim.scheduler.reset()
@@ -59,7 +59,7 @@ class Trans(object):
 
         # setup network
         net = Network('./network.txt')
-        net.loss(self.loss)
+        net.loss(loss)
 
         # setup routes
         n1 = net.get_node('n1')
@@ -92,7 +92,6 @@ class Trans(object):
         self.diff()
 
         self.filename = None
-        self.loss     = None
 
 
 if __name__ == '__main__':
