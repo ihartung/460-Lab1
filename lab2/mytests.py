@@ -39,28 +39,28 @@ def main():
 
     #Experiments
 
+    file_size = os.path.getsize("internet-architecture.pdf")
+
     data = []
     time = tester.run(1000, 0, "internet-architecture.pdf", False)
-    data.append((1000, time))
+    data.append((1000, file_size/time))
     time = tester.run(2000, 0, "internet-architecture.pdf", False)
-    data.append((2000, time))
+    data.append((2000, file_size/time))
     time = tester.run(5000, 0, "internet-architecture.pdf", False)
-    data.append((5000, time))
+    data.append((5000, file_size/time))
     time = tester.run(10000, 0, "internet-architecture.pdf", False)
-    data.append((10000, time))
+    data.append((10000, file_size/time))
     time = tester.run(15000, 0, "internet-architecture.pdf", False)
-    data.append((15000, time))
+    data.append((15000, file_size/time))
     time = tester.run(20000, 0, "internet-architecture.pdf", False)
-    data.append((20000, time))
+    data.append((20000, file_size/time))
 
-
-
-    df = pd.DataFrame(data = data, columns=['Window Size', 'Time']).sort_values(by=['Window Size', 'Time'], ascending=[True, True])
+    df = pd.DataFrame(data = data, columns=['Window Size', 'Throughput']).sort_values(by=['Window Size', 'Throughput'], ascending=[True, True])
     plt.figure()
 
-    ax = df.plot(x="Window Size",y="Time", color="green", label="Experimental")
+    ax = df.plot(x="Window Size",y="Throughput", color="green", label="Experimental")
 
-    ax.set_ylabel("Time (s)")
+    ax.set_ylabel("Throughput")
     ax.set_xlabel("Window Size")
     fig = ax.get_figure()
     fig.savefig('window_size.png')
