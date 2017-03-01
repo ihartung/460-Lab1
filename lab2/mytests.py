@@ -11,6 +11,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
+import os
+
 
 def main():
     
@@ -37,13 +39,31 @@ def main():
 
     #Experiments
 
+    data = []
+    time = tester.run(1000, 0, "internet-architecture.pdf", False)
+    data.append((1000, time))
+    time = tester.run(2000, 0, "internet-architecture.pdf", False)
+    data.append((2000, time))
+    time = tester.run(5000, 0, "internet-architecture.pdf", False)
+    data.append((5000, time))
+    time = tester.run(10000, 0, "internet-architecture.pdf", False)
+    data.append((10000, time))
+    time = tester.run(15000, 0, "internet-architecture.pdf", False)
+    data.append((15000, time))
+    time = tester.run(20000, 0, "internet-architecture.pdf", False)
+    data.append((20000, time))
 
-    tester.run(1000, 0, "internet-architecture.pdf", False)
-    tester.run(2000, 0, "internet-architecture.pdf", False)
-    tester.run(5000, 0, "internet-architecture.pdf", False)
-    tester.run(10000, 0, "internet-architecture.pdf", False)
-    tester.run(15000, 0, "internet-architecture.pdf", False)
-    tester.run(20000, 0, "internet-architecture.pdf", False)
+
+
+    df = pd.DataFrame(data = data, columns=['Window Size', 'Time']).sort_values(by=['Window Size', 'Time'], ascending=[True, True])
+    plt.figure()
+
+    ax = df.plot(x="Window Size",y="Time", color="green", label="Experimental")
+
+    ax.set_ylabel("Time (s)")
+    ax.set_xlabel("Window Size")
+    fig = ax.get_figure()
+    fig.savefig('window_size.png')
 
 
 
