@@ -97,6 +97,8 @@ class Trans(object):
 
         self.filename = None
 
+        return Sim.scheduler.current_time()
+
 
 if __name__ == '__main__':
     m = Main()
