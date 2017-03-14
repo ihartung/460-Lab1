@@ -53,8 +53,8 @@ class Trans(object):
         
         # parameters
         Sim.scheduler.reset()
-        #Sim.set_debug('AppHandler')
-        #Sim.set_debug('TCP')
+        Sim.set_debug('AppHandler')
+        Sim.set_debug('TCP')
         Sim.set_debug('Trans')
 
         # setup network

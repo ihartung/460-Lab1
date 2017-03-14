@@ -19,14 +19,14 @@ def main():
     
     #Basic Tests
     
-    tester.run(3000, 0, "test.txt", False)
-    tester.run(3000, .1, "test.txt", False)
-    tester.run(3000, .2, "test.txt", False)
-    tester.run(3000, .5, "test.txt", False)
+    #tester.run(3000, 0, "test.txt", False)
+    #tester.run(3000, .1, "test.txt", False)
+    #tester.run(3000, .2, "test.txt", False)
+    #tester.run(3000, .5, "test.txt", False)
     
     
-    tester.run(10000, 0, "internet-architecture.pdf", False)
-    tester.run(10000, .1, "internet-architecture.pdf", False)
+    #tester.run(10000, 0, "internet-architecture.pdf", False)
+    #tester.run(10000, .1, "internet-architecture.pdf", False)
 
     #Fast Retransmit
 
@@ -38,12 +38,12 @@ def main():
     #Experiments
 
 
-    tester.run(1000, 0, "internet-architecture.pdf", False)
-    tester.run(2000, 0, "internet-architecture.pdf", False)
-    tester.run(5000, 0, "internet-architecture.pdf", False)
-    tester.run(10000, 0, "internet-architecture.pdf", False)
-    tester.run(15000, 0, "internet-architecture.pdf", False)
-    tester.run(20000, 0, "internet-architecture.pdf", False)
+#   tester.run(1000, 0, "internet-architecture.pdf", False)
+#   tester.run(2000, 0, "internet-architecture.pdf", False)
+#   tester.run(5000, 0, "internet-architecture.pdf", False)
+#   tester.run(10000, 0, "internet-architecture.pdf", False)
+#    tester.run(15000, 0, "internet-architecture.pdf", False)
+#    tester.run(20000, 0, "internet-architecture.pdf", False)
 
 
 
