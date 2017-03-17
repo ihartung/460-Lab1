@@ -14,7 +14,7 @@ class TCP(Connection):
 
         # send window; represents the total number of bytes that may
         # be outstanding at one time
-        self.window = window
+        self.window = 1000
         # send buffer
         self.send_buffer = SendBuffer()
         # maximum segment size, in bytes
@@ -31,6 +31,10 @@ class TCP(Connection):
         # retransmission timer
         # timeout duration in seconds
         self.timeout = 1
+        self.threshold = 100000
+        self.slowStart = True
+        self.additiveIncrease = False
+        self.increment = 0
 
         # -- Receiver functionality
 
@@ -117,14 +121,39 @@ class TCP(Connection):
         else:
             self.repeat   = 1
             self.sequence = packet.ack_number
+            bytesReceived = packet.ack_number - self.sequence
+            if self.slowStart:
+                # Every time the sender receives an ACK for new data, increment cwnd by the number of new bytes of data acknowledged. Never increment cwnd by more than one MSS.
+                self.window += min(bytesReceived, self.mss)
+                if self.window > self.threshold:
+                    # Stop slow start when cwnd exceeds or equals the threshold
+                    self.slowStart = False
+                    self.additiveIncrease = True
+
+            if self.additiveIncrease:
+                # Once cwnd is larger than the threshold, use additive increase. Every time the sender receives an ACK for new data, increment cwnd by MSS*b/cwnd, where MSS is the maximum segment size (1000 bytes) and b is the number of new bytes acknowledged.
+                self.increment += (self.mss * bytesReceived / self.window)
+                if self.increment > self.mss:
+                    self.window += self.mss
+                    self.increment -= self.mss
+
             self.send_buffer.slide(packet.ack_number)
+
         if self.repeat == 4:
+            # A loss event is detected when there are three duplicate ACKs (meaning the fourth ACK in a row for the same sequence number), and TCP immediately retransmits instead of waiting for the retransmission timer.
             self.trace("fast_restransmit.  seq = %d" % (self.sequence))
             self.cancel_timer
             self.retransmit()
+            # When a loss event is detected (a timeout or 3 duplicate ACKs), then set the threshold to max(cwnd/2,MSS) and set cwnd to 1 MSS.
+            halfCWND = self.window/2
+            if halfCWND % self.mss != 0:
+                halfCWND = (halfCWND/self.mss * self.mss)
+            self.threshold = max(halfCWND, self.mss)
+            self.window = self.mss
+            self.increment = 0
 
-        self.sequence = packet.ack_number
-        self.send_buffer.slide(packet.ack_number)
+        # self.sequence = packet.ack_number
+        # self.send_buffer.slide(packet.ack_number)
         self.timer = Sim.scheduler.add(delay=self.timeout, event='retransmit', handler=self.retransmit)
         while (self.send_buffer.outstanding() < self.window):
             size = self.mss
@@ -136,6 +165,14 @@ class TCP(Connection):
             return
         size = self.mss
     def retransmit(self, event):
+        # When a loss event is detected (a timeout or 3 duplicate ACKs), then set the threshold to max(cwnd/2,MSS) and set cwnd to 1 MSS.
+        halfCWND = self.window/2
+        if halfCWND % self.mss != 0:
+            halfCWND = (halfCWND/self.mss * self.mss)
+        self.threshold = max(halfCWND, self.mss)
+        self.window = self.mss
+        self.increment = 0
+
         d, s = self.send_buffer.resend(size)
         self.send_packet(d, s)
         self.timer = Sim.scheduler.add(delay=self.timeout, event='retransmit', handler=self.retransmit)
