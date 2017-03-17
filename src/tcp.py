@@ -63,13 +63,13 @@ class TCP(Connection):
     ''' Sender '''
 
     def send(self, data):
-        
+
         self.send_buffer.put(data)
-        
+
         if not self.timer:
         # set a timer
             self.timer = Sim.scheduler.add(delay=self.timeout, event='retransmit', handler=self.retransmit)
-        
+
         while (self.send_buffer.outstanding() < self.window):
             size = self.mss
             d, s = self.send_buffer.get(size);
@@ -109,17 +109,19 @@ class TCP(Connection):
         self.cancel_timer()
         if self.sequence >= packet.ack_number:
             return
+            
         # Fast Restransmit
-            if packet.ack_number == self.sequence:
-                self.repeat = self.repeat + 1
-            else:
-                self.repeat   = 1
-                self.sequence = packet.ack_number
-                self.send_buffer.slide(packet.ack_number)
-            if self.repeat == 4:
-                self.trace("fast_restransmit.  seq = %d" % (self.sequence))
-                self.cancel_timer
-                self.retransmit()
+        if packet.ack_number == self.sequence:
+            self.repeat = self.repeat + 1
+        else:
+            self.repeat   = 1
+            self.sequence = packet.ack_number
+            self.send_buffer.slide(packet.ack_number)
+        if self.repeat == 4:
+            self.trace("fast_restransmit.  seq = %d" % (self.sequence))
+            self.cancel_timer
+            self.retransmit()
+
         self.sequence = packet.ack_number
         self.send_buffer.slide(packet.ack_number)
         self.timer = Sim.scheduler.add(delay=self.timeout, event='retransmit', handler=self.retransmit)
