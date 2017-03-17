@@ -39,6 +39,7 @@ class TCP(Connection):
         # ack number to send; represents the largest in-order sequence
         # number not yet received
         self.ack = 0
+
     def trace(self, message):
         """ Print debugging messages. """
         Sim.trace("TCP", message)
@@ -109,7 +110,7 @@ class TCP(Connection):
         self.cancel_timer()
         if self.sequence >= packet.ack_number:
             return
-            
+
         # Fast Restransmit
         if packet.ack_number == self.sequence:
             self.repeat = self.repeat + 1
