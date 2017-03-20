@@ -6,8 +6,7 @@ class TCP(Connection):
     """ A TCP connection between two hosts."""
 
     def __init__(self, transport, source_address, source_port,
-                 destination_address, destination_port, app=None, window=1000,drop=[]):
-                            destination_address, destination_port, app)
+                 destination_address, destination_port, app=None, drop=[]):
         Connection.__init__(self, transport, source_address, source_port,
 
         # -- Sender functionality

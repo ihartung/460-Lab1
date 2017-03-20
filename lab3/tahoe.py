@@ -7,7 +7,7 @@ sys.path.append('..')
 
 from src.sim import Sim
 from src.transport import Transport
-from src.tcp import TCP
+from src.tcp_tahoe import TCP
 
 from networks.network import Network
 
@@ -45,11 +45,10 @@ class Trans(object):
             print()
             print(result)
 
-    def run(self, janela, perda, fila, fast):
+    def run(self, fila, drop):
         
         self.filename = fila
-        loss     = perda
-        Sim.trace('Trans', "It is %s that I am using fast transmit." % (fast))
+        Sim.trace('Trans', "It is %s that I am using drop transmit." % (fast))
         
         # parameters
         Sim.scheduler.reset()
@@ -59,7 +58,6 @@ class Trans(object):
 
         # setup network
         net = Network('./network.txt')
-        net.loss(loss)
         
 
         # setup routes
@@ -79,8 +77,8 @@ class Trans(object):
         a = AppHandler(self.filename)
 
         # setup connection
-        c1 = TCP(t1, n1.get_address('n2'), 1, n2.get_address('n1'), 1, a, janela, fast)
-        c2 = TCP(t2, n2.get_address('n1'), 1, n1.get_address('n2'), 1, a, janela, fast)
+        c1 = TCP(t1, n1.get_address('n2'), 1, n2.get_address('n1'), 1, a, drop)
+        c2 = TCP(t2, n2.get_address('n1'), 1, n1.get_address('n2'), 1, a, drop)
 
         # send a file
         with open(self.filename, 'rb') as f:
