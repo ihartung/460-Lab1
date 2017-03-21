@@ -54,6 +54,14 @@ class TCP(Connection):
         if self.node.hostname =='n1':
             Sim.plot('sequence.csv','%s,%s,%s\n' % (Sim.scheduler.current_time(),sequence,event))
 
+    def plot_congestion_window_header(self):
+        if self.node.hostname =='n1':
+            Sim.plot('congestion-window.csv','Time,Size\n')
+
+    def plot_congestion_window(self,size):
+        if self.node.hostname =='n1':
+            Sim.plot('congestion-window.csv','%s,%s\n' % (Sim.scheduler.current_time(),size))
+
     def receive_packet(self, packet):
         """ Receive a packet from the network layer. """
         if packet.ack_number > 0:
