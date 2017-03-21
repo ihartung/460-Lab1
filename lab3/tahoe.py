@@ -58,7 +58,7 @@ class Trans(object):
         Sim.set_debug('Trans')
 
         # setup network
-        net = Network('./network.txt')
+        net = Network('network.txt')
 
 
         # setup routes

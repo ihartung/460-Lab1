@@ -19,10 +19,10 @@ def main():
     
     tester = Trans()
     
-    tester.run("test.txt", [])
-    tester.run("test.txt", [15])
-    tester.run("test.txt", [15,29])
-    tester.run("test.txt", [15,27,29])
+    tester.run("internet-architecture.pdf", [])
+    tester.run("internet-architecture.pdf", [15])
+    tester.run("internet-architecture.pdf", [15,29])
+    tester.run("internet-architecture.pdf", [15,27,29])
     
 
 

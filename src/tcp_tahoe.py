@@ -139,13 +139,11 @@ class TCP(Connection):
 	    else:
                 # Every time the sender receives an ACK for new data, increment cwnd by the number of new bytes of data acknowledged.Never increment cwnd by more than one MSS.
                 #self.window += min(bytesReceived, self.mss)
-            self.window += bytesReceived
-            if self.window > self.threshold:
+            	self.window += bytesReceived
+            	if self.window > self.threshold:
                 # Stop slow start when cwnd exceeds or equals the threshold
-                self.additiveIncrease = True
+                	self.additiveIncrease = True
             self.plot_congestion_window(self.window)
-
-
             self.send_buffer.slide(packet.ack_number)
 
         if self.repeat == 4:
@@ -175,10 +173,10 @@ class TCP(Connection):
         self.plot_congestion_window(self.window)
         self.increment = 0
         self.additiveIncrease = False
-
-        d, s = self.send_buffer.resend(size)
+        d, s = self.send_buffer.resend(self.window)
         self.send_packet(d, s)
         self.timer = Sim.scheduler.add(delay=self.timeout, event='retransmit', handler=self.retransmit)
+
     def cancel_timer(self):
         """ Cancel the timer. """
         if not self.timer:
