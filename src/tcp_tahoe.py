@@ -23,6 +23,7 @@ class TCP(Connection):
         self.sequence = 0
         # plot sequence numbers
         self.plot_sequence_header()
+        self.plot_congestion_window_header()
         # packets to drop
         self.drop = drop
         self.dropped = []
@@ -134,13 +135,15 @@ class TCP(Connection):
                 if self.increment > self.mss:
                     self.window += self.increment/self.mss * self.mss
                     self.increment -= self.increment/self.mss * self.mss
+                self.plot_congestion_window(self.window)
 	    else:
                 # Every time the sender receives an ACK for new data, increment cwnd by the number of new bytes of data acknowledged.Never increment cwnd by more than one MSS.
                 #self.window += min(bytesReceived, self.mss)
-		self.window += bytesReceived
-                if self.window > self.threshold:
-                    # Stop slow start when cwnd exceeds or equals the threshold
-                    self.additiveIncrease = True
+            self.window += bytesReceived
+            if self.window > self.threshold:
+                # Stop slow start when cwnd exceeds or equals the threshold
+                self.additiveIncrease = True
+            self.plot_congestion_window(self.window)
 
 
             self.send_buffer.slide(packet.ack_number)
@@ -169,8 +172,9 @@ class TCP(Connection):
         halfCWND = (halfCWND-(halfCWND % self.mss))
         self.threshold = max(halfCWND, self.mss)
         self.window = self.mss
+        self.plot_congestion_window(self.window)
         self.increment = 0
-	self.additiveIncrease = False
+        self.additiveIncrease = False
 
         d, s = self.send_buffer.resend(size)
         self.send_packet(d, s)
