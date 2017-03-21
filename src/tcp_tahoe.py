@@ -161,10 +161,12 @@ class TCP(Connection):
             self.send_packet(d, s)
             if not self.send_buffer.available():
                 return
-        if self.send_buffer.outstanding() == 0 and self.send_buffer.available() == 0:
-            return
+            if self.send_buffer.outstanding() == 0 and self.send_buffer.available() == 0:
+                return
         size = self.mss
     def retransmit(self, event):
+	if self.send_buffer.outstanding() == 0 and self.send_buffer.available() == 0:
+                return
         # When a loss event is detected (a timeout or 3 duplicate ACKs), then set the threshold to max(cwnd/2,MSS) and set cwnd to 1 MSS.
         halfCWND = self.window/2
         halfCWND = (halfCWND-(halfCWND % self.mss))
@@ -191,11 +193,13 @@ class TCP(Connection):
         self.trace("%s (%d) received TCP segment from %d for %d" % (
             an ACK."""
         self.trace("%s (%d) received TCP segment from %d for %d" % (self.node.hostname, packet.destination_address, packet.source_address, packet.sequence))
+	self.receive_buffer.put(packet.body, packet.sequence)
         d, s = self.receive_buffer.get()
         self.app.receive_data(d)
         self.ack = len(d) + s
         self.trace("Sending this ack from handle data: %d" % (self.ack))
         self.send_ack()
+
     def send_ack(self):
         """ Send an ack. """
         packet = TCPPacket(source_address=self.source_address,
