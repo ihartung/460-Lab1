@@ -7,15 +7,15 @@ class TCP(Connection):
 
     def __init__(self, transport, source_address, source_port,
                  destination_address, destination_port, app=None, drop=[]):
-        Connection.__init__(self, transport, source_address, source_port,
+        Connection.__init__(self, transport, source_address, source_port, destination_address, destination_port, app)
 
         # -- Sender functionality
 
         # maximum segment size, in bytes
-        self.mss = 1000 
+        self.mss = 1000
         # send window; represents the total number of bytes that may
         # be outstanding at one time
-        self.window = self.mss 
+        self.window = self.mss
         # send buffer
         self.send_buffer = SendBuffer()
         # largest sequence number that has been ACKed so far; represents
@@ -49,10 +49,10 @@ class TCP(Connection):
     def plot_sequence_header(self):
         if self.node.hostname =='n1':
             Sim.plot('sequence.csv','Time,Sequence Number,Event\n')
-    def plot_sequence(self,sequence,event):
 
-            Sim.plot('sequence.csv','%s,%s,%s\n' % (Sim.scheduler.current_time(),sequence,event))
+    def plot_sequence(self,sequence,event):
         if self.node.hostname =='n1':
+            Sim.plot('sequence.csv','%s,%s,%s\n' % (Sim.scheduler.current_time(),sequence,event))
 
     def receive_packet(self, packet):
         """ Receive a packet from the network layer. """
@@ -180,8 +180,7 @@ class TCP(Connection):
             the application, regardless of whether it is in order, and sends
         self.trace("%s (%d) received TCP segment from %d for %d" % (
             an ACK."""
-        self.receive_buffer.put(packet.body, packet.sequence)
-            self.node.hostname, packet.destination_address, packet.source_address, packet.sequence))
+        self.trace("%s (%d) received TCP segment from %d for %d" % (self.node.hostname, packet.destination_address, packet.source_address, packet.sequence))
         d, s = self.receive_buffer.get()
         self.app.receive_data(d)
         self.ack = len(d) + s
@@ -192,8 +191,8 @@ class TCP(Connection):
         packet = TCPPacket(source_address=self.source_address,
                            source_port=self.source_port,
                            destination_address=self.destination_address,
-                           sequence=self.sequence, ack_number=self.ack)
                            destination_port=self.destination_port,
+                           sequence=self.sequence, ack_number=self.ack)
         # send the packet
         self.trace("%s (%d) sending TCP ACK to %d for %d" % (
             self.node.hostname, self.source_address, self.destination_address, packet.ack_number))

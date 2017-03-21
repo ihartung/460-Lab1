@@ -46,10 +46,11 @@ class Trans(object):
             print(result)
 
     def run(self, fila, drop):
-        
+
         self.filename = fila
+        fast = True
         Sim.trace('Trans', "It is %s that I am using drop transmit." % (fast))
-        
+
         # parameters
         Sim.scheduler.reset()
         Sim.set_debug('AppHandler')
@@ -58,14 +59,14 @@ class Trans(object):
 
         # setup network
         net = Network('./network.txt')
-        
+
 
         # setup routes
         n1 = net.get_node('n1')
         n2 = net.get_node('n2')
         net.set_queue(n1.links[0], "100")
         net.set_queue(n2.links[0], "100")
-        
+
         n1.add_forwarding_entry(address=n2.get_address('n1'), link=n1.links[0])
         n2.add_forwarding_entry(address=n1.get_address('n2'), link=n2.links[0])
 
