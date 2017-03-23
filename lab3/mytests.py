@@ -14,9 +14,9 @@ def main():
     tester = Trans()
 
     tester.run("internet-architecture.pdf", [])
-    # tester.run("internet-architecture.pdf", [15])
-    # tester.run("internet-architecture.pdf", [15,29])
-    # tester.run("internet-architecture.pdf", [15,27,29])
+    # tester.run("internet-architecture.pdf", [14000])
+    # tester.run("internet-architecture.pdf", [14000,28000])
+    # tester.run("internet-architecture.pdf", [14000,26000,28000])
 
 if __name__ == '__main__':
     main()

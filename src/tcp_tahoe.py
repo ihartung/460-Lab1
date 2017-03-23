@@ -25,6 +25,7 @@ class TCP(Connection):
         # plot sequence numbers
         self.plot_sequence_header()
         self.plot_congestion_window_header()
+
         # packets to drop
         self.drop = drop
         self.dropped = []
@@ -97,6 +98,7 @@ class TCP(Connection):
                            destination_port=self.destination_port,
                            body=data,
                            sequence=sequence, ack_number=self.ack)
+
         if sequence in self.drop and not sequence in self.dropped:
             self.dropped.append(sequence)
             self.plot_sequence(sequence,'drop')
