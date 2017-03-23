@@ -119,11 +119,11 @@ class TCP(Connection):
     def handle_ack(self, packet):
         """ Handle an incoming ACK. """
         self.plot_sequence(packet.ack_number - 1000,'ack')
-        self.trace("%s (%d) received ACK from %d for %d" % (
-            self.node.hostname, packet.destination_address, packet.source_address, packet.ack_number))
+        self.trace("%s (%d) received ACK from %d for %d" % (self.node.hostname, packet.destination_address, packet.source_address, packet.ack_number))
         self.cancel_timer()
-        if self.sequence >= packet.ack_number:
-            return
+
+        # if self.sequence >= packet.ack_number:
+        #     return
 
         # Fast Restransmit
         if packet.ack_number == self.sequence:
@@ -132,22 +132,18 @@ class TCP(Connection):
             self.repeat   = 1
             bytesReceived = packet.ack_number - self.sequence
             self.sequence = packet.ack_number
-            print("SAMSAMSAM RECIEVED", bytesReceived)
-            print("SAMSAMSAM WINDOW NOW", self.window)
 
             if self.additiveIncrease:
                 # Once cwnd is larger than the threshold, use additive increase. Every time the sender receives an ACK for new data, increment cwnd by MSS*b/cwnd, where MSS is the maximum segment size (1000 bytes) and b is the number of new bytes acknowledged.
                 self.increment += (self.mss * bytesReceived / self.window)
                 if self.increment > self.mss:
                     self.window += self.increment/self.mss * self.mss
-                    self.increment -= self.increment/self.mss * self.mss
-                self.plot_congestion_window(self.window)
+                    self.increment = 0
 
             else:
-                # Every time the sender receives an ACK for new data, increment cwnd by the number of new bytes of data acknowledged.Never increment cwnd by more than one MSS.
+                # Every time the sender receives an ACK for new data, increment cwnd by the number of new bytes of data acknowledged. Never increment cwnd by more than one MSS.
                 #self.window += min(bytesReceived, self.mss)
-            	self.window += bytesReceived
-                print("SAMSAMSAM WINDOW", self.window)
+            	self.window += min(bytesReceived, self.mss)
             	if self.window > self.threshold:
                 # Stop slow start when cwnd exceeds or equals the threshold
                 	self.additiveIncrease = True
@@ -158,8 +154,8 @@ class TCP(Connection):
         if self.repeat == 4:
             # A loss event is detected when there are three duplicate ACKs (meaning the fourth ACK in a row for the same sequence number), and TCP immediately retransmits instead of waiting for the retransmission timer.
             self.trace("fast_restransmit.  seq = %d" % (self.sequence))
-            self.retransmit()
-	    return
+            self.retransmit("restransmit")
+            return
 
         # self.sequence = packet.ack_number
         # self.send_buffer.slide(packet.ack_number)
@@ -172,11 +168,12 @@ class TCP(Connection):
                 return
             if self.send_buffer.outstanding() == 0 and self.send_buffer.available() == 0:
                 return
-        size = self.mss
+
+        # size = self.mss
 
     def retransmit(self, event):
-	if self.send_buffer.outstanding() == 0 and self.send_buffer.available() == 0:
-                return
+        if self.send_buffer.outstanding() == 0 and self.send_buffer.available() == 0:
+            return
         # When a loss event is detected (a timeout or 3 duplicate ACKs), then set the threshold to max(cwnd/2,MSS) and set cwnd to 1 MSS.
         halfCWND = self.window/2
         halfCWND = (halfCWND-(halfCWND % self.mss))
@@ -195,6 +192,7 @@ class TCP(Connection):
             return
         Sim.scheduler.cancel(self.timer)
         self.timer = None
+
     ''' Receiver '''
 
     def handle_data(self, packet):
@@ -203,7 +201,7 @@ class TCP(Connection):
         self.trace("%s (%d) received TCP segment from %d for %d" % (
             an ACK."""
         self.trace("%s (%d) received TCP segment from %d for %d" % (self.node.hostname, packet.destination_address, packet.source_address, packet.sequence))
-	self.receive_buffer.put(packet.body, packet.sequence)
+        self.receive_buffer.put(packet.body, packet.sequence)
         d, s = self.receive_buffer.get()
         self.app.receive_data(d)
         self.ack = len(d) + s
@@ -218,6 +216,5 @@ class TCP(Connection):
                            destination_port=self.destination_port,
                            sequence=self.sequence, ack_number=self.ack)
         # send the packet
-        self.trace("%s (%d) sending TCP ACK to %d for %d" % (
-            self.node.hostname, self.source_address, self.destination_address, packet.ack_number))
+        self.trace("%s (%d) sending TCP ACK to %d for %d" % (self.node.hostname, self.source_address, self.destination_address, packet.ack_number))
         self.transport.send_packet(packet)

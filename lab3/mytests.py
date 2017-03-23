@@ -13,8 +13,8 @@ def main():
 
     tester = Trans()
 
-    tester.run("internet-architecture.pdf", [])
-    # tester.run("internet-architecture.pdf", [14000])
+    # tester.run("internet-architecture.pdf", [])
+    tester.run("internet-architecture.pdf", [14000])
     # tester.run("internet-architecture.pdf", [14000,28000])
     # tester.run("internet-architecture.pdf", [14000,26000,28000])
 
