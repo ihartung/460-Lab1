@@ -2,6 +2,7 @@ from .buffer import SendBuffer, ReceiveBuffer
 from .connection import Connection
 from .sim import Sim
 from .tcppacket import TCPPacket
+
 class TCP(Connection):
     """ A TCP connection between two hosts."""
 
@@ -57,11 +58,11 @@ class TCP(Connection):
 
     def plot_congestion_window_header(self):
         if self.node.hostname =='n1':
-            Sim.plot('congestion-window.csv','Time,Size\n')
+            Sim.plot('cwnd.csv','Time,Congestion Window\n')
 
     def plot_congestion_window(self,size):
         if self.node.hostname =='n1':
-            Sim.plot('congestion-window.csv','%s,%s\n' % (Sim.scheduler.current_time(),size))
+            Sim.plot('cwnd.csv','%s,%s\n' % (Sim.scheduler.current_time(),size))
 
     def receive_packet(self, packet):
         """ Receive a packet from the network layer. """

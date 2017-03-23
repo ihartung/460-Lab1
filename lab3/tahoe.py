@@ -50,6 +50,7 @@ class Trans(object):
         self.filename = fila
         fast = True
         Sim.trace('Trans', "It is %s that I am using drop transmit." % (fast))
+        Sim.set_debug("Plot")
 
         # parameters
         Sim.scheduler.reset()
