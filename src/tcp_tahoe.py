@@ -130,8 +130,11 @@ class TCP(Connection):
             self.repeat = self.repeat + 1
         else:
             self.repeat   = 1
-            self.sequence = packet.ack_number
             bytesReceived = packet.ack_number - self.sequence
+            self.sequence = packet.ack_number
+            print("SAMSAMSAM RECIEVED", bytesReceived)
+            print("SAMSAMSAM WINDOW NOW", self.window)
+
             if self.additiveIncrease:
                 # Once cwnd is larger than the threshold, use additive increase. Every time the sender receives an ACK for new data, increment cwnd by MSS*b/cwnd, where MSS is the maximum segment size (1000 bytes) and b is the number of new bytes acknowledged.
                 self.increment += (self.mss * bytesReceived / self.window)
@@ -139,13 +142,16 @@ class TCP(Connection):
                     self.window += self.increment/self.mss * self.mss
                     self.increment -= self.increment/self.mss * self.mss
                 self.plot_congestion_window(self.window)
-	    else:
+
+            else:
                 # Every time the sender receives an ACK for new data, increment cwnd by the number of new bytes of data acknowledged.Never increment cwnd by more than one MSS.
                 #self.window += min(bytesReceived, self.mss)
             	self.window += bytesReceived
+                print("SAMSAMSAM WINDOW", self.window)
             	if self.window > self.threshold:
                 # Stop slow start when cwnd exceeds or equals the threshold
                 	self.additiveIncrease = True
+
             self.plot_congestion_window(self.window)
             self.send_buffer.slide(packet.ack_number)
 
@@ -167,6 +173,7 @@ class TCP(Connection):
             if self.send_buffer.outstanding() == 0 and self.send_buffer.available() == 0:
                 return
         size = self.mss
+
     def retransmit(self, event):
 	if self.send_buffer.outstanding() == 0 and self.send_buffer.available() == 0:
                 return
