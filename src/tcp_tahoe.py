@@ -136,14 +136,14 @@ class TCP(Connection):
             if self.additiveIncrease:
                 # Once cwnd is larger than the threshold, use additive increase. Every time the sender receives an ACK for new data, increment cwnd by MSS*b/cwnd, where MSS is the maximum segment size (1000 bytes) and b is the number of new bytes acknowledged.
                 self.increment += (self.mss * bytesReceived / self.window)
-                if self.increment > self.mss:
-                    self.window += self.increment/self.mss * self.mss
+                if self.increment >= self.mss:
+                    self.window += self.mss
                     self.increment -= self.mss
 
             else:
                 # Every time the sender receives an ACK for new data, increment cwnd by the number of new bytes of data acknowledged. Never increment cwnd by more than one MSS.
             	self.window += min(bytesReceived, self.mss)
-            	if self.window > self.threshold:
+            	if self.window >= self.threshold:
                     # Stop slow start when cwnd exceeds or equals the threshold
                 	self.additiveIncrease = True
 
@@ -153,7 +153,7 @@ class TCP(Connection):
         if self.repeat == 4:
             # A loss event is detected when there are three duplicate ACKs (meaning the fourth ACK in a row for the same sequence number), and TCP immediately retransmits instead of waiting for the retransmission timer.
             self.trace("fast_restransmit.  seq = %d" % (self.sequence))
-            self.retransmit("restransmit")
+            self.retransmit("fast")
             return
 
         # self.sequence = packet.ack_number
@@ -173,6 +173,7 @@ class TCP(Connection):
     def retransmit(self, event):
         if self.send_buffer.outstanding() == 0 and self.send_buffer.available() == 0:
             return
+
         # When a loss event is detected (a timeout or 3 duplicate ACKs), then set the threshold to max(cwnd/2,MSS) and set cwnd to 1 MSS.
         halfCWND = self.window/2
         halfCWND = (halfCWND-(halfCWND % self.mss))
