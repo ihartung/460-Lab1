@@ -32,7 +32,7 @@ class TCP(Connection):
         self.timer = None
         # retransmission timer
         # timeout duration in seconds
-        self.timeout = 1
+        self.timeout = 10
         self.threshold = 100000
         self.additiveIncrease = False
         self.increment = 0
