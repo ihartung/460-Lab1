@@ -138,14 +138,13 @@ class TCP(Connection):
                 self.increment += (self.mss * bytesReceived / self.window)
                 if self.increment > self.mss:
                     self.window += self.increment/self.mss * self.mss
-                    self.increment = 0
+                    self.increment -= self.mss
 
             else:
                 # Every time the sender receives an ACK for new data, increment cwnd by the number of new bytes of data acknowledged. Never increment cwnd by more than one MSS.
-                #self.window += min(bytesReceived, self.mss)
             	self.window += min(bytesReceived, self.mss)
             	if self.window > self.threshold:
-                # Stop slow start when cwnd exceeds or equals the threshold
+                    # Stop slow start when cwnd exceeds or equals the threshold
                 	self.additiveIncrease = True
 
             self.plot_congestion_window(self.window)
