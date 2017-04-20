@@ -31,7 +31,9 @@ class Node(object):
         return None
 
     def get_link_with_address(self, address):
-        return links[address]
+        for link in links:
+            if link.address == address:
+                return link
 
     def get_address(self, name):
         for link in self.links:
