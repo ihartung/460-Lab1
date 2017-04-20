@@ -6,7 +6,7 @@ sys.path.append('..')
 
 from src.sim import Sim
 from src.packet import Packet
-from lab4.dvrouting import DvroutingApp
+from dvrouting import DvroutingApp
 
 from networks.network import Network
 
@@ -102,7 +102,7 @@ def exp1():
     # run the simulation
     Sim.scheduler.run()
 
-    def exp2():
+def exp2():
     # parameters
     Sim.scheduler.reset()
     Sim.set_debug(True)
@@ -284,7 +284,7 @@ def exp1():
     # run the simulation
     Sim.scheduler.run()
 
-    def exp3():
+def exp3():
     # parameters
     Sim.scheduler.reset()
     Sim.set_debug(True)
@@ -326,15 +326,15 @@ def exp1():
     p_setup(n14)
     p_setup(n15)
 
-    
+
 
     # run the simulation
     Sim.scheduler.run()
 
-    def main():
-        exp1()
-        exp2()
-        exp3()
+def main():
+    exp1()
+    exp2()
+    #exp3()
 
 if __name__ == '__main__':
     main()
