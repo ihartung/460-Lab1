@@ -30,6 +30,9 @@ class Node(object):
                 return link
         return None
 
+    def get_link_with_address(self, address):
+        return links[address]
+
     def get_address(self, name):
         for link in self.links:
             if link.endpoint.hostname == name:

@@ -58,6 +58,7 @@ def main():
         source_address=n1.get_address('n2'),
         destination_address=0,
         ident=2, ttl=1, protocol='broadcast', length=100)
+    print("this is an address of n2",n1.get_address('n3'))
     Sim.scheduler.add(delay=1, event=p, handler=n1.send_packet)
 
     # send a broadcast packet from 3 with TTL 1, so just nodes 1, 4, and 5
