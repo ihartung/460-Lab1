@@ -7,7 +7,6 @@ sys.path.append('..')
 from src.sim import Sim
 from src.packet import Packet
 from lab4.dvrouting import DvroutingApp
-from lab4.broadcast import BroadcastApp
 
 from networks.network import Network
 
@@ -20,9 +19,7 @@ class BroadcastApp(object):
         print(Sim.scheduler.current_time(), self.node.hostname, packet.ident)
 
 def p_setup(nodey):
-    b = BroadcastApp(nodey)
     dv = DvroutingApp(nodey)
-    nodey.add_protocol(protocol="broadcast", handler=b)
     nodey.add_protocol(protocol="dvrouting", handler=dv)
 
 
@@ -49,29 +46,58 @@ def exp1():
     p_setup(n4)
     p_setup(n5)
 
+    
+    #send to every node from n1
+    p = Packet(destination_address=n2.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n1.send_packet)
+    p = Packet(destination_address=n3.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n1.send_packet)
+    p = Packet(destination_address=n4.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n1.send_packet)
+    p = Packet(destination_address=n5.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n1.send_packet)
 
-    # send a broadcast packet from 1 with TTL 2, so everyone should get it
-    p = Packet(
-        source_address=n1.get_address('n2'),
-        destination_address=0,
-        ident=1, ttl=2, protocol='broadcast', length=100)
-    Sim.scheduler.add(delay=0, event=p, handler=n1.send_packet)
+    #send to every node from n2
+    p = Packet(destination_address=n1.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n2.send_packet)
+    p = Packet(destination_address=n5.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n2.send_packet)
+    p = Packet(destination_address=n3.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n2.send_packet)
+    p = Packet(destination_address=n4.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n2.send_packet)
 
-    # send a broadcast packet from 1 with TTL 1, so just nodes 2 and 3
-    # should get it
-    p = Packet(
-        source_address=n1.get_address('n2'),
-        destination_address=0,
-        ident=2, ttl=1, protocol='broadcast', length=100)
-    Sim.scheduler.add(delay=1, event=p, handler=n1.send_packet)
+    #send to every node from n3
+    p = Packet(destination_address=n1.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n3.send_packet)
+    p = Packet(destination_address=n2.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n3.send_packet)
+    p = Packet(destination_address=n4.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n3.send_packet)
+    p = Packet(destination_address=n5.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n3.send_packet)
 
-    # send a broadcast packet from 3 with TTL 1, so just nodes 1, 4, and 5
-    # should get it
-    p = Packet(
-        source_address=n3.get_address('n1'),
-        destination_address=0,
-        ident=3, ttl=1, protocol='broadcast', length=100)
-    Sim.scheduler.add(delay=2, event=p, handler=n3.send_packet)
+    #send to every node from n4
+    p = Packet(destination_address=n2.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n4.send_packet)
+    p = Packet(destination_address=n1.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n4.send_packet)
+    p = Packet(destination_address=n3.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n4.send_packet)
+    p = Packet(destination_address=n5.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n4.send_packet)
+
+    #send to every node from n5
+    p = Packet(destination_address=n2.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n5.send_packet)
+    p = Packet(destination_address=n3.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n5.send_packet)
+    p = Packet(destination_address=n4.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n5.send_packet)
+    p = Packet(destination_address=n1.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n5.send_packet)
+
+
 
     # run the simulation
     Sim.scheduler.run()
@@ -99,28 +125,161 @@ def exp1():
     p_setup(n5)
 
 
-    # send a broadcast packet from 1 with TTL 2, so everyone should get it
-    p = Packet(
-        source_address=n1.get_address('n2'),
-        destination_address=0,
-        ident=1, ttl=2, protocol='broadcast', length=100)
-    Sim.scheduler.add(delay=0, event=p, handler=n1.send_packet)
+    #send to every node from n1
+    p = Packet(destination_address=n2.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n1.send_packet)
+    p = Packet(destination_address=n3.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n1.send_packet)
+    p = Packet(destination_address=n4.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n1.send_packet)
+    p = Packet(destination_address=n5.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n1.send_packet)
 
-    # send a broadcast packet from 1 with TTL 1, so just nodes 2 and 3
-    # should get it
-    p = Packet(
-        source_address=n1.get_address('n2'),
-        destination_address=0,
-        ident=2, ttl=1, protocol='broadcast', length=100)
-    Sim.scheduler.add(delay=1, event=p, handler=n1.send_packet)
+    #send to every node from n2
+    p = Packet(destination_address=n1.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n2.send_packet)
+    p = Packet(destination_address=n5.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n2.send_packet)
+    p = Packet(destination_address=n3.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n2.send_packet)
+    p = Packet(destination_address=n4.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n2.send_packet)
 
-    # send a broadcast packet from 3 with TTL 1, so just nodes 1, 4, and 5
-    # should get it
-    p = Packet(
-        source_address=n3.get_address('n1'),
-        destination_address=0,
-        ident=3, ttl=1, protocol='broadcast', length=100)
-    Sim.scheduler.add(delay=2, event=p, handler=n3.send_packet)
+    #send to every node from n3
+    p = Packet(destination_address=n1.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n3.send_packet)
+    p = Packet(destination_address=n2.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n3.send_packet)
+    p = Packet(destination_address=n4.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n3.send_packet)
+    p = Packet(destination_address=n5.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n3.send_packet)
+
+    #send to every node from n4
+    p = Packet(destination_address=n2.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n4.send_packet)
+    p = Packet(destination_address=n1.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n4.send_packet)
+    p = Packet(destination_address=n3.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n4.send_packet)
+    p = Packet(destination_address=n5.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n4.send_packet)
+
+    #send to every node from n5
+    p = Packet(destination_address=n2.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n5.send_packet)
+    p = Packet(destination_address=n3.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n5.send_packet)
+    p = Packet(destination_address=n4.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n5.send_packet)
+    p = Packet(destination_address=n1.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=5, event=p, handler=n5.send_packet)
+
+    Sim.scheduler.add(delay=6, event=None, handler=n1.get_link('n2').down)
+
+    #wait for things to update
+
+    #send to every node from n1
+    p = Packet(destination_address=n2.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=10, event=p, handler=n1.send_packet)
+    p = Packet(destination_address=n3.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=10, event=p, handler=n1.send_packet)
+    p = Packet(destination_address=n4.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=10, event=p, handler=n1.send_packet)
+    p = Packet(destination_address=n5.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=10, event=p, handler=n1.send_packet)
+
+    #send to every node from n2
+    p = Packet(destination_address=n1.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=10, event=p, handler=n2.send_packet)
+    p = Packet(destination_address=n5.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=10, event=p, handler=n2.send_packet)
+    p = Packet(destination_address=n3.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=10, event=p, handler=n2.send_packet)
+    p = Packet(destination_address=n4.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=10, event=p, handler=n2.send_packet)
+
+    #send to every node from n3
+    p = Packet(destination_address=n1.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=10, event=p, handler=n3.send_packet)
+    p = Packet(destination_address=n2.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=10, event=p, handler=n3.send_packet)
+    p = Packet(destination_address=n4.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=10, event=p, handler=n3.send_packet)
+    p = Packet(destination_address=n5.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=10, event=p, handler=n3.send_packet)
+
+    #send to every node from n4
+    p = Packet(destination_address=n2.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=10, event=p, handler=n4.send_packet)
+    p = Packet(destination_address=n1.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=10, event=p, handler=n4.send_packet)
+    p = Packet(destination_address=n3.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=10, event=p, handler=n4.send_packet)
+    p = Packet(destination_address=n5.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=10, event=p, handler=n4.send_packet)
+
+    #send to every node from n5
+    p = Packet(destination_address=n2.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=10, event=p, handler=n5.send_packet)
+    p = Packet(destination_address=n3.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=10, event=p, handler=n5.send_packet)
+    p = Packet(destination_address=n4.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=10, event=p, handler=n5.send_packet)
+    p = Packet(destination_address=n1.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=10, event=p, handler=n5.send_packet)
+
+    Sim.scheduler.add(delay=11, event=None, handler=n1.get_link('n2').up)
+
+    #send to every node from n1
+    p = Packet(destination_address=n2.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=15, event=p, handler=n1.send_packet)
+    p = Packet(destination_address=n3.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=15, event=p, handler=n1.send_packet)
+    p = Packet(destination_address=n4.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=15, event=p, handler=n1.send_packet)
+    p = Packet(destination_address=n5.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=15, event=p, handler=n1.send_packet)
+
+    #send to every node from n2
+    p = Packet(destination_address=n1.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=15, event=p, handler=n2.send_packet)
+    p = Packet(destination_address=n5.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=15, event=p, handler=n2.send_packet)
+    p = Packet(destination_address=n3.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=15, event=p, handler=n2.send_packet)
+    p = Packet(destination_address=n4.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=15, event=p, handler=n2.send_packet)
+
+    #send to every node from n3
+    p = Packet(destination_address=n1.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=15, event=p, handler=n3.send_packet)
+    p = Packet(destination_address=n2.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=15, event=p, handler=n3.send_packet)
+    p = Packet(destination_address=n4.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=15, event=p, handler=n3.send_packet)
+    p = Packet(destination_address=n5.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=15, event=p, handler=n3.send_packet)
+
+    #send to every node from n4
+    p = Packet(destination_address=n2.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=15, event=p, handler=n4.send_packet)
+    p = Packet(destination_address=n1.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=15, event=p, handler=n4.send_packet)
+    p = Packet(destination_address=n3.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=15, event=p, handler=n4.send_packet)
+    p = Packet(destination_address=n5.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=15, event=p, handler=n4.send_packet)
+
+    #send to every node from n5
+    p = Packet(destination_address=n2.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=15, event=p, handler=n5.send_packet)
+    p = Packet(destination_address=n3.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=15, event=p, handler=n5.send_packet)
+    p = Packet(destination_address=n4.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=15, event=p, handler=n5.send_packet)
+    p = Packet(destination_address=n1.get_address('n1'), ident=1, protocol='delay', length=1000)
+    Sim.scheduler.add(delay=15, event=p, handler=n5.send_packet)
 
     # run the simulation
     Sim.scheduler.run()
@@ -167,29 +326,7 @@ def exp1():
     p_setup(n14)
     p_setup(n15)
 
-
-    # send a broadcast packet from 1 with TTL 2, so everyone should get it
-    p = Packet(
-        source_address=n1.get_address('n2'),
-        destination_address=0,
-        ident=1, ttl=2, protocol='broadcast', length=100)
-    Sim.scheduler.add(delay=0, event=p, handler=n1.send_packet)
-
-    # send a broadcast packet from 1 with TTL 1, so just nodes 2 and 3
-    # should get it
-    p = Packet(
-        source_address=n1.get_address('n2'),
-        destination_address=0,
-        ident=2, ttl=1, protocol='broadcast', length=100)
-    Sim.scheduler.add(delay=1, event=p, handler=n1.send_packet)
-
-    # send a broadcast packet from 3 with TTL 1, so just nodes 1, 4, and 5
-    # should get it
-    p = Packet(
-        source_address=n3.get_address('n1'),
-        destination_address=0,
-        ident=3, ttl=1, protocol='broadcast', length=100)
-    Sim.scheduler.add(delay=2, event=p, handler=n3.send_packet)
+    
 
     # run the simulation
     Sim.scheduler.run()
